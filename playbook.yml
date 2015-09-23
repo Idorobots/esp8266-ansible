@@ -2,6 +2,9 @@
 - hosts: all
   vars:
     - sdk_root: "/opt/Espressif/"
+    - nodemcu_root: "/opt/NodeMCU/"
+    - nodemcu_env:
+        path: "$PATH:{{ sdk_root }}/xtensa-lx106-elf/bin/"
 
   tasks:
     - name: update apt cache
@@ -15,9 +18,10 @@
                    gperf, flex, bison, texinfo, gawk, ncurses-dev,
                    libexpat-dev, python, python-serial, sed, git, unzip]
 
-    - name: crate SDK root
+    - name: crate directories
       sudo: true
-      file: dest="{{ sdk_root }}" mode=0777 state=directory
+      file: dest={{ item }} mode=0777 state=directory
+      with_items: ["{{ sdk_root }}", "{{ nodemcu_root }}"]
 
     - name: clone esp-open-sdk
       git:
@@ -28,3 +32,13 @@
 
     - name: build esp-open-sdk
       shell: "cd {{ sdk_root }} && make STANDALONE=y"
+
+    - name: clone nodemcu-firmware
+      git:
+        repo: https://github.com/nodemcu/nodemcu-firmware.git
+        force: yes
+        dest: "{{ nodemcu_root }}"
+
+    - name: build nodemcu-firmware
+      environment: nodemcu_env
+      shell: "cd {{ nodemcu_root }} && make"
