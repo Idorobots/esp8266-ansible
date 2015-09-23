@@ -1,6 +1,6 @@
 # ESP8266 toolchain
 
-Ansible + Vagrant provisioning scripts for full ESP8266 toolchain environment including the NodeMCU firmware.
+Ansible + Vagrant provisioning scripts for full ESP8266 toolchain environment including the NodeMCU firmware & some helpers.
 
 # Requirements
 
