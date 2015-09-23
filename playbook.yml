@@ -1,0 +1,30 @@
+---
+- hosts: all
+  vars:
+    - sdk_root: "/opt/Espressif/"
+
+  tasks:
+    - name: update apt cache
+      sudo: true
+      apt: update_cache=yes
+
+    - name: install deps
+      sudo: true
+      apt: name={{ item }} state=present
+      with_items: [make, unrar-free, autoconf, automake, libtool, gcc, g++,
+                   gperf, flex, bison, texinfo, gawk, ncurses-dev,
+                   libexpat-dev, python, python-serial, sed, git, unzip]
+
+    - name: crate SDK root
+      sudo: true
+      file: dest="{{ sdk_root }}" mode=0777 state=directory
+
+    - name: clone esp-open-sdk
+      git:
+        repo: https://github.com/pfalcon/esp-open-sdk.git
+        force: yes
+        dest: "{{ sdk_root }}"
+        recursive: yes
+
+    - name: build esp-open-sdk
+      shell: "cd {{ sdk_root }} && make STANDALONE=y"
